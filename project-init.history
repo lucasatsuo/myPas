@@ -1,0 +1,8 @@
+  482  grep '\.c' Makefile |cut -f1 -d\\
+  483  c=$(grep '\.c' Makefile |cut -f1 -d\\)
+  487  for f in $c;do echo '/**@<'$f'>::**/' >> $f;done
+  495  h=$(for f in $c;do echo $(basename $f .c ).h;done)
+  506  for f in $h;do echo '/**@<'$f'>::**/' > $f;done
+  508  f=tokens.h;echo '/**@<'$f'>::**/' > $f
+  510  f=mytype.h;echo '/**@<'$f'>::**/' > $f
+  514  history > project-init.history

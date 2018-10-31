@@ -1,0 +1,19 @@
+Este arquivo indica as mudanças que foram sendo feitas com o passar do tempo.
+
+----------------------------------------------------------------------------
+
+Dia 27/10
+
+As definições que estavam nos arquivos .c foram passadas para os arquivos .h
+equivalentes.
+
+no lexer.c :
+    Na função isRELOP() foi criado o caso para o != [NEQ]
+    Foi criada a função iskeyword()
+
+
+----------------------------------------------------------------------------
+
+Dia 30/10
+
+
