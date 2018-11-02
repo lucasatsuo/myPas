@@ -1,5 +1,6 @@
 /**@<keywords.c>::**/
 #include <keywords.h>
+#include <mytype.h>
  
 char *keyword[] = {
 	"begin",

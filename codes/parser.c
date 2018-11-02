@@ -53,7 +53,7 @@ void header(void){
 	while(issubroutine()){
 		if(lookahead == PROCEDURE)
 			procmodel();
-		else
+		else if(lookahead == FUNCTION)
 			funcmodel();
 	}
 }
@@ -87,6 +87,7 @@ varlist -> ID { , ID }
 void varlist(void){
 	match(ID);
 	while(lookahead == ','){
+		match(',');
 		match(ID);
 	}
 }
@@ -271,7 +272,9 @@ void expr(void){
 }
 /***************************************************************************
 
-smpexpr -> [ + | - ] term { oplus term }
+smpexpr -> [ + | - ] fact { otimes fact } { oplus fact { otimes fact }}
+// tem que mudar o comentario para ascii art
+
 ***************************************************************************/
 void smpexpr(void){
 	flag_t             isneg  =  0;
@@ -284,10 +287,10 @@ void smpexpr(void){
 	    /**
 	    * Agenda operação de negação do acc
 	    */
-	    isneg = (oplus == '-');/*1*/
+	    // isneg = (oplus == '-');/*1*/
 		match(oplus);
 	}
-	oplus = 0;
+	// oplus = 0;
 
 	T_begin:
 
@@ -299,20 +302,20 @@ void smpexpr(void){
     /**
     * Realiza a operação de negação
     */
-	if (isneg) {
-		acc = -acc;
-		isneg = 0;
-	}
+	// if (isneg) {
+		// acc = -acc;
+		// isneg = 0;
+	// }
 	/*1'*/
 
     /*2'*/
     /**
     *  Realiza a operação de otimes
     */
-	if (otimes) {
-		basicops(otimes);
-		otimes = 0;
-	}
+	// if (otimes) {
+		// basicops(otimes);
+		// otimes = 0;
+	// }
         /*2'*/
 
 	otimes = lookahead;
@@ -321,31 +324,33 @@ void smpexpr(void){
     	/**
     	* Agenda operação de otimes
     	*/
-    	++sp;stack[sp]=acc;/*2*/
+    	// ++sp;stack[sp]=acc;/*2*/
 		match(otimes);
 		goto F_begin;
-	} else { otimes = 0; }
+	}
+	 // else { otimes = 0; }
 
     /*3'*/
 	/**
 	*  Realiza a operação de oplus
 	*/
-	if (oplus) {
-		basicops(oplus);
-		oplus = 0;
-	}
+	// if (oplus) {
+		// basicops(oplus);
+		// oplus = 0;
+	// }
         /*3'*/
 
 	oplus = lookahead;
-	if (oplus == '+' || oplus == '-' || oplus == OR || oplus == MOD) {
+	if (oplus == '+' || oplus == '-' || oplus == OR) { // ver se eh isso mesmo ou se tem MOD
     	/*3*/
 		/**
 		* Agenda operação de oplus
 		*/
-    	++sp;stack[sp]=acc;/*3*/
+    	// ++sp;stack[sp]=acc;/*3*/
 		match(oplus);
 		goto T_begin;            
-	} else { oplus = 0; }
+	}
+	 // else { oplus = 0; }
 }
 /***************************************************************************
 // usar a versao melhor que a gente criou no myBC
@@ -366,17 +371,22 @@ void factor(void)
 	switch (lookahead) {
 		case ID:
 		match(ID);
-			if(lookahead == '='){ // ID[=EXPR]
+			if(lookahead == ASGN){ // ID[=EXPR]
 				// r_val
 				// coloca a nova variavel na symtab
-				char variable[100];
-				strcpy(variable,lexeme);
-				match('='); expr();
-				STappend(variable,acc);
-			} else {
+				// char variable[100];
+				// strcpy(variable,lexeme);
+				// match('='); expr();
+				// STappend(variable,acc);
+				match(ASGN);
+				expr();
+			} else if(lookahead == '(') {
+				match('(');
+				exprlist();
+				match(')');
 				// l_val
 				// busca o valor do id e poe no acc
-				acc = valtab[STlookup(lexeme)];
+				// acc = valtab[STlookup(lexeme)];
 			}
 			break;
 
@@ -386,7 +396,7 @@ void factor(void)
 			/**
 			* Salva o valor do lexeme no acc
 			*/
-			acc = atof(lexeme);
+			// acc = atof(lexeme);
 			match(lookahead);
 	    	/*4*/
 			break;

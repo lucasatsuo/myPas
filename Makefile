@@ -6,19 +6,19 @@
 
 projectname=mypas
 projectdir=$(PWD)/
-codesdir=$(projectdir)/codes/
-includedir=$(projectdir)/include/
-bindir=$(projectdir)/bin/
+codesdir=codes/
+includedir=include/
+bindir=bin/
 
 default:
-	(cd $(codesdir); make )
+	(cd $(codesdir) && make )
 
 mypas: default
 	(cd $(bindir); ./$(projectname))
 
 clean:
-	(cd $(codesdir); make $@ )
-	(cd $(includedir); make $@ )
+	(cd $(codesdir) && make $@ )
+	(cd $(includedir) && make $@ )
 
 mostlyclean:
 	(cd $(codesdir); make $@ )
