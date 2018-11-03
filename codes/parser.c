@@ -1,15 +1,6 @@
 /**@<parser.c>::**/
 #include <parser.h>
-
-void match(token_t expected){
-	if(expected == lookahead){
-		lookahead = gettoken(source);
-	}else{
-		printf("Token mismatch expected %d, found %d\n", expected, lookahead);
-		exit(1);
-	}
-}
-
+	
 /***************************************************************************
 Syntax definitions for the academic project My Pascal,
 which is a simplified / modified Pascal compiler,

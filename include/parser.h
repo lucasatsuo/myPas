@@ -5,8 +5,8 @@
 #include <mytype.h>
 #include <keywords.h>
 #include <tokens.h>
+#include <interface.h>
 
-void match(token_t expected);
 void mypas(void);
 void header(void); 
 void body(void);
@@ -31,7 +31,6 @@ void factor(void);
 void exprlist(void);
 void whlstmt(void);
 void repstmt(void);
-
 
 token_t lookahead;
 extern FILE *source;

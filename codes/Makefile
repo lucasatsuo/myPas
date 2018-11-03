@@ -19,12 +19,14 @@ cfiles=\
 		lexer.c\
 		parser.c\
 		keywords.c\
+		interface.c
 		
 ofiles=\
        mypas.o\
        lexer.o\
        parser.o\
        keywords.o\
+       interface.o
 
 CFLAGS=-g -I$(includedir)
 
