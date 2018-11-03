@@ -2,14 +2,17 @@
 #include <lexer.h>
 
 size_t linenumber = 1;
+size_t collummnumber = 1;
 
 token_t ignoreneutrals(FILE * tape){
     int head;
 
 _ignoreneutrals_start:
     while (isspace(head = getc(tape))) {
-	    if (head == '\n') {
+	    collummnumber++
+        if (head == '\n') {
 		    linenumber++;
+            collummnumber = 1;
 	    }
     }
     if ( head == '{' ) {
