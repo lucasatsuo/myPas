@@ -274,6 +274,7 @@ void expr(void){
 
 smpexpr -> [ + | - ] fact { otimes fact } { oplus fact { otimes fact }}
 // tem que mudar o comentario para ascii art
+// TRUE e FALSE devem ser tratados aqui?
 
 ***************************************************************************/
 void smpexpr(void){
@@ -400,7 +401,10 @@ void factor(void)
 			match(lookahead);
 	    	/*4*/
 			break;
-
+		case TRUE:
+		case FALSE:
+			match(lookahead);
+			break;
 		default:
 		match('('); expr(); match(')'); 
 	}
