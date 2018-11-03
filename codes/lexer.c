@@ -17,16 +17,20 @@ _ignoreneutrals_start:
     }
     if ( head == '{' ) {
 	    while ( (head = getc(tape)) != '}' ) {
+            collummnumber++
 		    if (head == EOF) {
 			    return EOF;
+
 		    }
 		    if (head == '\n') {
 			    linenumber++;
+                collummnumber = 1;
 		    }
 	    }
 	    goto _ignoreneutrals_start;
     }
     ungetc(head, tape);
+    collummnumber--;
     return 0;
 }
 
