@@ -9,6 +9,7 @@ projectdir=$(PWD)/
 codesdir=codes/
 includedir=include/
 bindir=bin/
+RM=erase
 
 default:
 	(cd $(codesdir) && make )
@@ -21,7 +22,7 @@ clean:
 	(cd $(includedir) && make $@ )
 
 mostlyclean:
-	(cd $(codesdir); make $@ )
-	(cd $(includedir); make $@ )
-	(cd $(bindir); $(RM) $(projectname))
+	(cd $(codesdir) && make $@ )
+	(cd $(includedir) && make $@ )
+	(cd $(bindir) && $(RM) *)
 

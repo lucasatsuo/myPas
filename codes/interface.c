@@ -17,18 +17,20 @@ void match(token_t expected){
 		translator(charexp, expected);
 
 		printf("Token mismatch expected '%s', found '%s'\n", charexp, charlook);
-		printf("On line: %d\n", linenumber);
+		printf("At line: %d\n", linenumber);
 		exit(1);
 	}
 }
 
 void translator(char *translated, token_t original){
-		if(original < 1024){
-			translated[0] = original;
-			translated[1] = 0;
-		}else if(original < 8192){
-			strcpy(translated, "TOKEN");
-		}else{
-			strcpy(translated, keyword[original-8192]);
-		}
+	if(original == -1){
+		strcpy(translated, "EOF");
+	}else if(original < 1024){
+		translated[0] = original;
+		translated[1] = 0;
+	}else if(original < 8192){
+		strcpy(translated, "TOKEN");
+	}else{
+		strcpy(translated, keyword[original-8192]);
+	}
 }

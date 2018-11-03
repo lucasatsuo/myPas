@@ -8,6 +8,7 @@ projectname=mypas
 projectdir=$(PWD)/../
 codesdir=$(projectdir)/codes/
 includedir=$(projectdir)/include/
+RM=erase
 
 default:
 	(cd $(codesdir); make)
