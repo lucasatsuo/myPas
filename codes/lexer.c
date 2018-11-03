@@ -175,9 +175,6 @@ isNUM(FILE * tape)
     return token;
 }
 
-
-
-
 token_t isID(FILE * tape)
 {
     int i = 0;
