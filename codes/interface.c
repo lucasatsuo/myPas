@@ -3,6 +3,7 @@
 #include <lexer.h>
 
 extern size_t linenumber;
+extern size_t collummnumber;
 extern char *keyword[];
 
 void translator(char *translated, token_t original);
@@ -18,6 +19,7 @@ void match(token_t expected){
 
 		printf("Token mismatch expected '%s', found '%s'\n", charexp, charlook);
 		printf("At line: %d\n", linenumber);
+		printf("At collumm: %d/n",collummnumber);
 		exit(1);
 	}
 }
