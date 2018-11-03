@@ -5,7 +5,8 @@
 #
 
 projectname=mypas
-
+CC=gcc
+RM=erase
 includedir=../include/
 
 execdir=../bin/
@@ -18,18 +19,12 @@ cfiles=\
 		lexer.c\
 		parser.c\
 		keywords.c\
-		symtab.c\
-		typecheck.c\
-		pseudocode.c
 		
 ofiles=\
        mypas.o\
        lexer.o\
        parser.o\
        keywords.o\
-       symtab.o\
-       typecheck.o\
-       pseudocode.o
 
 CFLAGS=-g -I$(includedir)
 

@@ -14,6 +14,9 @@ no lexer.c :
 
 ----------------------------------------------------------------------------
 
-Dia 30/10
+Dia 02/11
 
+Remocao dos erros do parser para aceitar a linguagem pas
+Esta aceitando os exemplos, exceto os formatos TEXT e FILE
+Id nao esta reconhecendo underline a_dfdf
 
