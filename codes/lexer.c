@@ -9,7 +9,7 @@ token_t ignoreneutrals(FILE * tape){
 
 _ignoreneutrals_start:
     while (isspace(head = getc(tape))) {
-	    collummnumber++
+	    collummnumber++;
         if (head == '\n') {
 		    linenumber++;
             collummnumber = 1;
@@ -17,7 +17,7 @@ _ignoreneutrals_start:
     }
     if ( head == '{' ) {
 	    while ( (head = getc(tape)) != '}' ) {
-            collummnumber++
+            collummnumber++;
 		    if (head == EOF) {
 			    return EOF;
 
