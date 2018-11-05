@@ -14,7 +14,6 @@ _ignoreneutrals_start:
 	    // collummnumber++;
         if (head == '\n') {
 		    linenumber++;
-		    printf("[collummnumber %d]\n", collummnumber);
             collummnumber = 1;
 	    }
     }

@@ -18,8 +18,8 @@ void match(token_t expected){
 		translator(charexp, expected);
 
 		printf("Token mismatch expected '%s', found '%s'\n", charexp, charlook);
-		printf("At line: %d\n", linenumber);
-		printf("At collumm: %d\n",collummnumber);
+		printf("At line  : %d\n", linenumber);
+		printf("At column: %d\n",collummnumber);
 		exit(1);
 	}
 }
