@@ -8,19 +8,21 @@ token_t ignoreneutrals(FILE * tape){
     int head;
 
 _ignoreneutrals_start:
-    while (isspace(head = getc(tape))) {
-	    collummnumber++;
+	// collummnumber tem que estar na frente senao quando isspace() e falso
+	// collummnumber++ nao e realizado
+    while (collummnumber++ && isspace(head = getc(tape))) {
+	    // collummnumber++;
         if (head == '\n') {
 		    linenumber++;
+		    printf("[collummnumber %d]\n", collummnumber);
             collummnumber = 1;
 	    }
     }
     if ( head == '{' ) {
-	    while ( (head = getc(tape)) != '}' ) {
-            collummnumber++;
+	    while ( collummnumber++ && (head = getc(tape)) != '}' ) {
+            // collummnumber++;
 		    if (head == EOF) {
 			    return EOF;
-
 		    }
 		    if (head == '\n') {
 			    linenumber++;
@@ -39,6 +41,7 @@ token_t isASGN(FILE * tape)
 	if ( (lexeme[0] = getc(tape)) == ':' ) {
 		if ( (lexeme[1] = getc(tape)) == '=' ) {
 			lexeme[2] = 0;
+			collummnumber += 2;
 			return ASGN;
 		}
 		ungetc(lexeme[1], tape);
@@ -53,6 +56,7 @@ token_t isRELOP(FILE * tape)
 	case'<':
 		lexeme[1] = getc(tape);
 		lexeme[2] = 0;
+		collummnumber += 2;
 		switch (lexeme[1]) {
 		case'=':
 			return LEQ;
@@ -61,18 +65,22 @@ token_t isRELOP(FILE * tape)
 		}
 		ungetc(lexeme[1], tape);
 		lexeme[1] = 0;
+		collummnumber--;
 		return lexeme[0];
 	case'>':
 		lexeme[1] = getc(tape);
+		collummnumber += 2;
 		if (lexeme[1] == '=') {
 			lexeme[2] = 0;
 			return GEQ;
 		} 
 		ungetc(lexeme[1], tape);
 		lexeme[1] = 0;
+		collummnumber--;
 		return lexeme[0];
 	case'=':
 		lexeme[1] = 0;
+		collummnumber++;
 		return lexeme[0];
 	}
 	ungetc(lexeme[0], tape);
@@ -106,7 +114,8 @@ chk_EE(FILE * tape, int i0)
                 i++;
             ungetc(lexeme[i], tape);
             lexeme[i] = 0;
-         return i;
+            i--;
+        	return i;
         } else {
             /** reaching out this line means this is NAN **/
             for (; i > i0; i--) {
@@ -157,6 +166,7 @@ isNUM(FILE * tape)
                 /** NAN **/
                 ungetc(lexeme[i], tape);
                 ungetc('.', tape);
+                collummnumber += i;
                 return token;
             }
         }
@@ -178,6 +188,7 @@ isNUM(FILE * tape)
     /** check scientific notation: **/
     i = chk_EE(tape, i);
     lexeme[++i]=0;
+    collummnumber += i;
 
     return token;
 }
@@ -194,8 +205,11 @@ token_t isID(FILE * tape)
         ungetc(lexeme[i], tape);
         lexeme[i] = 0;
         token = iskeyword(lexeme);
-        if (token)
+        if (token){
+        	collummnumber += i;
             return token;
+        }
+    	collummnumber += i;
         return ID;
     }
 
@@ -216,5 +230,8 @@ token_t gettoken(FILE * tape)
     if(token = isNUM(tape))
     	return token;
 
-    return token = getc(tape);
+    token = getc(tape);
+    collummnumber++;
+    return token;
 }
+

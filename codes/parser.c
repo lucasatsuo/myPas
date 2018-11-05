@@ -394,6 +394,7 @@ void factor(void)
 			break;
 		case TRUE:
 		case FALSE:
+		case NOT:
 			match(lookahead);
 			break;
 		default:
