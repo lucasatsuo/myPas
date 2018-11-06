@@ -4,31 +4,58 @@
 size_t linenumber = 1;
 size_t collummnumber = 1;
 
+/* 3 formas de comentar qual deve ser usada e quando? 
+diagrama sintatico : por favor, nunca
+EBNF : somente nas gramaticas, perhaps
+regex 
+
+ignoreneutrals: 
+
+            +-------+
+-->----->-- |isspace| --.-----.--------------->-----------------.-->-- bye
+  |     |   +-------+   |     V                                 ^
+  |     ^               V     '->- ('{') -.---->---.- ('}') ->--|   
+  |     '-------<-------'                 |        |            |         
+  ^                                       ^        V            V
+  |                                       '-(^'}')-'            |
+  |                                                             |
+  '-----------------------------<-------------------------------'
+
+
+
+ignoreneutrals: { {isspace} ['{' {^'}'} '}'] }
+
+ignoreneutrals: ( isspace* { [^}] } )*
+
+*/
+
+/**
+* ignora caracteres que nao serao computados
+* entrada: traducao(source input stream)
+* retorna: 0 ou -1 se encontrar EOF prematuro
+*/
 token_t ignoreneutrals(FILE * tape){
     int head;
-
 _ignoreneutrals_start:
-	// collummnumber tem que estar na frente senao quando isspace() e falso
-	// collummnumber++ nao e realizado
-    while (collummnumber++ && isspace(head = getc(tape))) {
-	    // collummnumber++;
+    // pergunta: esses comentario sao bons? parece poluido
+    // collummnumber mantem a contagem das colunas, em sincronia com getc() ungetc()
+    while (collummnumber++ && isspace(head = getc(tape))) { // ignora brancos
         if (head == '\n') {
-		    linenumber++;
+            linenumber++; // linenumber e incrementado somente quando ha \n
             collummnumber = 1;
-	    }
+        }
     }
-    if ( head == '{' ) {
-	    while ( collummnumber++ && (head = getc(tape)) != '}' ) {
-            // collummnumber++;
-		    if (head == EOF) {
-			    return EOF;
-		    }
-		    if (head == '\n') {
-			    linenumber++;
+    if ( head == '{' ) { // ignora comentarios
+        while ( collummnumber++ && (head = getc(tape)) != '}' ) {
+            if (head == EOF) {
+                return EOF;
+            }
+            if (head == '\n') {
+                linenumber++;
                 collummnumber = 1;
-		    }
-	    }
-	    goto _ignoreneutrals_start;
+            }
+        }
+        goto _ignoreneutrals_start;
     }
     ungetc(head, tape);
     collummnumber--;
@@ -37,53 +64,53 @@ _ignoreneutrals_start:
 
 token_t isASGN(FILE * tape)
 {
-	if ( (lexeme[0] = getc(tape)) == ':' ) {
-		if ( (lexeme[1] = getc(tape)) == '=' ) {
-			lexeme[2] = 0;
-			collummnumber += 2;
-			return ASGN;
-		}
-		ungetc(lexeme[1], tape);
-	}
-	ungetc(lexeme[0], tape);
-	return lexeme[0] = 0;
+    if ( (lexeme[0] = getc(tape)) == ':' ) {
+        if ( (lexeme[1] = getc(tape)) == '=' ) {
+            lexeme[2] = 0;
+            collummnumber += 2;
+            return ASGN;
+        }
+        ungetc(lexeme[1], tape);
+    }
+    ungetc(lexeme[0], tape);
+    return lexeme[0] = 0;
 }
 
 token_t isRELOP(FILE * tape)
 {
-	switch (lexeme[0] = getc(tape)) {
-	case'<':
-		lexeme[1] = getc(tape);
-		lexeme[2] = 0;
-		collummnumber += 2;
-		switch (lexeme[1]) {
-		case'=':
-			return LEQ;
-		case'>':
-			return NEQ;
-		}
-		ungetc(lexeme[1], tape);
-		lexeme[1] = 0;
-		collummnumber--;
-		return lexeme[0];
-	case'>':
-		lexeme[1] = getc(tape);
-		collummnumber += 2;
-		if (lexeme[1] == '=') {
-			lexeme[2] = 0;
-			return GEQ;
-		} 
-		ungetc(lexeme[1], tape);
-		lexeme[1] = 0;
-		collummnumber--;
-		return lexeme[0];
-	case'=':
-		lexeme[1] = 0;
-		collummnumber++;
-		return lexeme[0];
-	}
-	ungetc(lexeme[0], tape);
-	return lexeme[0] = 0;
+    switch (lexeme[0] = getc(tape)) {
+    case'<':
+        lexeme[1] = getc(tape);
+        lexeme[2] = 0;
+        collummnumber += 2;
+        switch (lexeme[1]) {
+        case'=':
+            return LEQ;
+        case'>':
+            return NEQ;
+        }
+        ungetc(lexeme[1], tape);
+        lexeme[1] = 0;
+        collummnumber--;
+        return lexeme[0];
+    case'>':
+        lexeme[1] = getc(tape);
+        collummnumber += 2;
+        if (lexeme[1] == '=') {
+            lexeme[2] = 0;
+            return GEQ;
+        } 
+        ungetc(lexeme[1], tape);
+        lexeme[1] = 0;
+        collummnumber--;
+        return lexeme[0];
+    case'=':
+        lexeme[1] = 0;
+        collummnumber++;
+        return lexeme[0];
+    }
+    ungetc(lexeme[0], tape);
+    return lexeme[0] = 0;
 }
 
 /** EE = [eE] ['+''-']? FRAC
@@ -114,7 +141,7 @@ chk_EE(FILE * tape, int i0)
             ungetc(lexeme[i], tape);
             lexeme[i] = 0;
             i--;
-        	return i;
+            return i;
         } else {
             /** reaching out this line means this is NAN **/
             for (; i > i0; i--) {
@@ -205,10 +232,10 @@ token_t isID(FILE * tape)
         lexeme[i] = 0;
         token = iskeyword(lexeme);
         if (token){
-        	collummnumber += i;
+            collummnumber += i;
             return token;
         }
-    	collummnumber += i;
+        collummnumber += i;
         return ID;
     }
 
@@ -223,11 +250,11 @@ token_t gettoken(FILE * tape)
     if(token = isID(tape))
         return token;
     if(token = isASGN(tape))
-    	return token;
+        return token;
     if(token = isRELOP(tape))
-    	return token;
+        return token;
     if(token = isNUM(tape))
-    	return token;
+        return token;
 
     token = getc(tape);
     collummnumber++;

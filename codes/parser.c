@@ -2,6 +2,11 @@
 #include <parser.h>
 	
 /***************************************************************************
+*
+* a palavra "mod" em keywords nunca foi usada, deve ser implementada?
+* e quanto a FILE, TEXT, LOGIC, que tem na lista de 2014, ex 6 e 7
+*
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 Syntax definitions for the academic project My Pascal,
 which is a simplified / modified Pascal compiler,
 according to the following EBNF grammar:

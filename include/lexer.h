@@ -8,6 +8,12 @@
 #include <tokens.h>
 #include <keywords.h>
 
+/* * * * * * * * * * * * * * * * * * * * * ** * * * * * * *
+*
+* nos headers precisa de comentarios tambem? 
+*
+* * * * * * * * * * * * * * * * * * * * * * * * ** * * * * * */
+
 #define MAXIDLEN 0x100
 
 extern char lexeme[MAXIDLEN + 1];

@@ -1,4 +1,4 @@
-{ test on functionalities }
+{ test on each functionalities }
 
 program my_program; { mypas() }
 
@@ -38,5 +38,5 @@ begin
             end;
             begin
             end;
-        until not pi * newton(a>b, 12<44, not 32.2)
+        until not pi * newton(a>b, 12<44, not false)
 end.
