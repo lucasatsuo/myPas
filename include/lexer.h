@@ -15,4 +15,3 @@ extern char lexeme[MAXIDLEN + 1];
 char lexeme[MAXIDLEN + 1];
 
 token_t gettoken(FILE * tape);
-token_t iskeyword(const char *);

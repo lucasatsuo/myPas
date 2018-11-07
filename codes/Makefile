@@ -1,18 +1,15 @@
 #!/usr/make -f
-# Author: Eraldo P Marinho
-# First version: Wed Oct 10 14:47:20 -03 2018
+# Author: Felipe Balascio, Leonardo Kanashiro, Lucas Atsuo
+# First version: Wed Nov 7 2018
 # Makefile for code directory of the MyPas project
 #
 
 projectname=mypas
-CC=gcc
-RM=erase
-includedir=../include/
-
-execdir=../bin/
+projectdir=$(PWD)/../
+includedir=$(projectdir)/include/
+execdir=$(projectdir)/bin/
 
 execpath=$(execdir)$(projectname)
-# execpath=$(execdir)
 
 cfiles=\
 		mypas.c\

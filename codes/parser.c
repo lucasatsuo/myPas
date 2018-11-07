@@ -2,17 +2,16 @@
 #include <parser.h>
 	
 /***************************************************************************
-Syntax definitions for the academic project My Pascal,
-which is a simplified / modified Pascal compiler,
-according to the following EBNF grammar:
+
+Definicoes sintaticas para uma versao simplificada de um compilador Pascal.
+Para o curso de Compiladores.
+De acordo com as seguintes gramaticas EBNF.
 
 Start symbol:: mypas
 
 Production Rules::
 
 mypas -> PROGRAM ID ; header body .
-
-Recursive LL(1) form
 ***************************************************************************/
 void mypas(void)
 {
@@ -27,9 +26,8 @@ void mypas(void)
 Declarative scope::
 
 header -> varmodel { procmodel | funcmodel }
-
-Vai ser necessario criar um predicado para controlar o fecho de kleene
 ***************************************************************************/
+/* Abstrai FIRST(subroutine) */
 flag_t issubroutine(void){
 	switch(lookahead){
 		case PROCEDURE:
@@ -51,6 +49,7 @@ void header(void){
 /***************************************************************************
 
 varmodel -> [ VAR  vargroup { vargroup } ]
+
 ***************************************************************************/
 void varmodel(void){
 	if(lookahead == VAR){
@@ -64,6 +63,7 @@ void varmodel(void){
 /***************************************************************************
 
 vargroup -> varlist : pretype ;
+
 ***************************************************************************/
 void vargroup(void){
 	varlist();
@@ -74,6 +74,7 @@ void vargroup(void){
 /***************************************************************************
 
 varlist -> ID { , ID }
+
 ***************************************************************************/
 void varlist(void){
 	match(ID);
@@ -85,6 +86,7 @@ void varlist(void){
 /***************************************************************************
 
 pretype -> BOOLEAN | INTEGER | REAL | DOUBLE
+
 ***************************************************************************/
 void pretype(void){
 	switch(lookahead){
@@ -104,6 +106,7 @@ void pretype(void){
 /***************************************************************************
 
 procmodel -> PROCEDURE ID formalparms ; header body ;
+
 ***************************************************************************/
 void procmodel(void){
 	match(PROCEDURE);
@@ -117,6 +120,7 @@ void procmodel(void){
 /***************************************************************************
 
 funcmodel -> FUNCTION ID formalparms : pretype ; header body ;
+
 ***************************************************************************/
 void funcmodel(void){
 	match(FUNCTION);
@@ -132,6 +136,7 @@ void funcmodel(void){
 /***************************************************************************
 
 formalparms -> [ ( arglist ) ]
+
 ***************************************************************************/
 void formalparms(void){
 	if(lookahead == '('){
@@ -143,6 +148,7 @@ void formalparms(void){
 /***************************************************************************
 
 arglist -> argmodel { ; argmodel }
+
 ***************************************************************************/
 void arglist(void){
 	argmodel();
@@ -155,6 +161,7 @@ void arglist(void){
 /***************************************************************************
 
 argmodel -> [ VAR ] varlist : pretype
+
 ***************************************************************************/
 void argmodel(void){
 	if(lookahead == VAR){
@@ -177,6 +184,7 @@ void body(void){
 /***************************************************************************
 
 stmtlist -> stmt { ; stmt }
+
 ***************************************************************************/
 void stmtlist(void){
 	stmt();
@@ -190,7 +198,7 @@ stmt ->   body
 | ifstmt
 | whlstmt
 | repstmt
-| smpexpr // + - ( NOT ID UINT FLTP TRUE FALSE 
+| smpexpr
 | <empty>
 ***************************************************************************/
 void stmt(void){
@@ -208,7 +216,7 @@ void stmt(void){
 			repstmt();
 			break;
 		default:
-			switch(lookahead){
+			switch(lookahead){ /* abstrai FIRST(smpexpr) */
 				case '+': case '-': case '(':
 				case NOT: case ID: case UINT: case FLTP:
 				case TRUE: case FALSE:
@@ -222,6 +230,7 @@ void stmt(void){
 /***************************************************************************
 
 ifstmt -> IF expr THEN stmt [ ELSE stmt ]
+
 ***************************************************************************/
 void ifstmt(void){
 	match(IF);
@@ -263,134 +272,84 @@ void expr(void){
 }
 /***************************************************************************
 
-smpexpr -> [ + | - ] fact { otimes fact } { oplus fact { otimes fact }}
-// tem que mudar o comentario para ascii art
-// TRUE e FALSE devem ser tratados aqui?
+smpexpr -> [ isneg ] fact { otimes fact } { oplus fact { otimes fact }}
+
+isneg  -> NOT | + | - 
+otimes -> AND | DIV | * | /
+oplus  -> OR | + | -
+
+                              .---<--- (  oplus ) ---<---.
+smpexpr:                      |                          |
+                              |   .-<- ( otimes ) -<-.   |
+                              |   |                  |   |
+                              |   |    +--------+    |   |
+-->-.-------->--------.--->---'->-'->- | factor | ->-'->-'---->---- end
+    |                 |                +--------+
+    '->- ( isneg ) ->-'
 
 ***************************************************************************/
 void smpexpr(void){
-	flag_t             isneg  =  0;
-	flag_t             otimes =  0;
-	flag_t             oplus  =  0;
+	/* Estas flags sao usadas para aproximar a visualizacao do codigo
+	com o digrama sintatico */
+	flag_t    isneg  =  0;
+	flag_t    otimes =  0;
+	flag_t    oplus  =  0;
 
+	/* Primeiro verifica se ha uma negacao */
 	oplus = lookahead;
-	if (oplus == '+' || oplus == '-') {
-	    /*1*/
-	    /**
-	    * Agenda operação de negação do acc
-	    */
-	    // isneg = (oplus == '-');/*1*/
+	if (oplus == '+' || oplus == '-' || oplus == NOT) {
 		match(oplus);
 	}
-	// oplus = 0;
 
-	T_begin:
-
-	F_begin:
+	T_begin: F_begin:
 
 	factor();
 
-    /*1'*/
-    /**
-    * Realiza a operação de negação
-    */
-	// if (isneg) {
-		// acc = -acc;
-		// isneg = 0;
-	// }
-	/*1'*/
-
-    /*2'*/
-    /**
-    *  Realiza a operação de otimes
-    */
-	// if (otimes) {
-		// basicops(otimes);
-		// otimes = 0;
-	// }
-        /*2'*/
-
-	otimes = lookahead;
-	if (otimes == '*' || otimes == '/' || otimes == AND || otimes == DIV) {
-    	/*2*/
-    	/**
-    	* Agenda operação de otimes
-    	*/
-    	// ++sp;stack[sp]=acc;/*2*/
-		match(otimes);
-		goto F_begin;
-	}
-	 // else { otimes = 0; }
-
-    /*3'*/
-	/**
-	*  Realiza a operação de oplus
+	/* Nesse ponto, esta dentro do laco em torno do factor
+	cada vez que encontra um otimes, ou oplus volta para o factor(), igual a gramatica
+	o uso do GOTO para otimizacao 
+	ifs com otimes e oplus abstraem respectivamente
+	{ otimes fact } 
+	{ oplus fact { otimes fact }}
 	*/
-	// if (oplus) {
-		// basicops(oplus);
-		// oplus = 0;
-	// }
-        /*3'*/
+	otimes = lookahead;
+	if (otimes == '*' || otimes == '/' || otimes == AND || otimes == DIV || otimes == MOD) {
+		match(otimes);
+		goto F_begin; 
+	}
 
 	oplus = lookahead;
-	if (oplus == '+' || oplus == '-' || oplus == OR) { // ver se eh isso mesmo ou se tem MOD
-    	/*3*/
-		/**
-		* Agenda operação de oplus
-		*/
-    	// ++sp;stack[sp]=acc;/*3*/
+	if (oplus == '+' || oplus == '-' || oplus == OR) { 
 		match(oplus);
 		goto T_begin;            
 	}
-	 // else { oplus = 0; }
 }
 /***************************************************************************
-// usar a versao melhor que a gente criou no myBC
-
-term -> factor { otimes factor }
-***************************************************************************/
-
-/***************************************************************************
-
-factor ->   ID [ ":=" expr  | ( exprlist ) ] // velho
-factor ->   ID [ ASGN expr  | ( exprlist ) ] // fazer isso em todos os ":="
+factor ->   ID [ ASGN expr | ( exprlist ) ] 
   | UINT
   | FLTP
+  | TRUE
+  | FALSE
   | ( expr )
 ***************************************************************************/
 void factor(void)
 {
+	/* Dentro de factor que sera feita a identificacao das variaveis e constantes */
 	switch (lookahead) {
 		case ID:
 		match(ID);
-			if(lookahead == ASGN){ // ID[=EXPR]
-				// r_val
-				// coloca a nova variavel na symtab
-				// char variable[100];
-				// strcpy(variable,lexeme);
-				// match('='); expr();
-				// STappend(variable,acc);
+			if(lookahead == ASGN){
 				match(ASGN);
 				expr();
 			} else if(lookahead == '(') {
 				match('(');
 				exprlist();
 				match(')');
-				// l_val
-				// busca o valor do id e poe no acc
-				// acc = valtab[STlookup(lexeme)];
 			}
 			break;
-
 		case UINT:
 		case FLTP:
-	        /*4*/
-			/**
-			* Salva o valor do lexeme no acc
-			*/
-			// acc = atof(lexeme);
 			match(lookahead);
-	    	/*4*/
 			break;
 		case TRUE:
 		case FALSE:
@@ -403,9 +362,9 @@ void factor(void)
 /***************************************************************************
 
 exprlist -> expr { , expr }
+
 ***************************************************************************/
 void exprlist(void){
-	
 	expr();
 	while(lookahead==','){
 		match(',');
@@ -416,6 +375,7 @@ void exprlist(void){
 /***************************************************************************
 
 whlstmt -> WHILE expr DO stmt
+
 ***************************************************************************/
 void whlstmt(void){
 	match(WHILE);
@@ -426,6 +386,7 @@ void whlstmt(void){
 /***************************************************************************
 
 repstmt -> REPEAT stmtlist UNTIL expr
+
 ***************************************************************************/
 void repstmt(void){
 	match(REPEAT);

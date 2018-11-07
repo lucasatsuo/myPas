@@ -49,14 +49,13 @@ ifstmt -> IF expr THEN stmt [ ELSE stmt ]
 
 expr -> smpexpr [ relop smpexpr ]
 
-smpexpr -> [ + | - ] fact { otimes fact } { oplus fact { otimes fact }}
+smpexpr -> [ + | - | NOT ] fact { otimes fact } { oplus fact { otimes fact }}
 
 fact -> ID [ ASGN expr | ( exprlist )] 
 		| UINT 
 		| FLTP 
 		| TRUE 
 		| FALSE 
-		| NOT 
 		| (expr)
 
 exprlist -> expr { , expr }

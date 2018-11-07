@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <tokens.h>
+#include <mytype.h>
+
+token_t iskeyword(const char *);
 
 /****************************
 Keywords:: 
@@ -41,3 +44,4 @@ enum {
 	TRUE,
 	FALSE,
 };
+

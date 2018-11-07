@@ -1,7 +1,6 @@
 /**@parser.h::**/
 #include <stdio.h>
 #include <stdlib.h>
-#include <lexer.h>
 #include <mytype.h>
 #include <keywords.h>
 #include <tokens.h>
@@ -32,5 +31,4 @@ void exprlist(void);
 void whlstmt(void);
 void repstmt(void);
 
-token_t lookahead;
 extern FILE *source;
