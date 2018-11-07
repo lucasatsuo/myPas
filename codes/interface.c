@@ -22,8 +22,8 @@ void match(token_t expected){
 		translator(stringexp, expected);
 
 		fprintf(stderr,"Token mismatch expected '%s', found '%s'\n", stringexp, stringlook);
-		fprintf(stderr,"At line  : %d\n", linenumber);
-		fprintf(stderr,"At column: %d\n", collummnumber);
+		fprintf(stderr,"At line  : %ld\n", linenumber);
+		fprintf(stderr,"At column: %ld\n", collummnumber);
 		exit(1);
 	}
 }
