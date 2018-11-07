@@ -5,7 +5,7 @@ program my_program; { mypas() }
 { header() }
 var { varmodel() }
     a, b, c : boolean ;
-    i, j, k : real ;
+    a;, j, k : real ;
     t, u, v : integer ;
     x, y, z : double ;
 
