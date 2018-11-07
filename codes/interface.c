@@ -22,9 +22,9 @@ void match(token_t expected){
 		translator(stringlook, lookahead);
 		translator(stringexp, expected);
 
-		printf("Token mismatch expected '%s', found '%s'\n", stringexp, stringlook);
-		printf("At line  : %d\n", linenumber);
-		printf("At column: %d\n", collummnumber);
+		fprintf(stderr,"Token mismatch expected '%s', found '%s'\n", stringexp, stringlook);
+		fprintf(stderr,"At line  : %d\n", linenumber);
+		fprintf(stderr,"At column: %d\n", collummnumber);
 		exit(1);
 	}
 }
