@@ -30,13 +30,13 @@ _ignoreneutrals_start:
 
 /* collummnumber sincroniza a cada getc() e ungetc() 
    linenumber atualiza a contagem a cada \n encontrado */
-    while (collummnumber++ && isspace(head = getc(tape))) { // ignora brancos
+    while (collummnumber++ && isspace(head = getc(tape))) { /* ignora brancos*/
         if (head == '\n') {
             linenumber++;
             collummnumber = 1;
         }
     }
-    if ( head == '{' ) { // ignora comentarios
+    if ( head == '{' ) { /* ignora comentarios */
         while ( collummnumber++ && (head = getc(tape)) != '}' ) {
             if (head == EOF) {
                 return EOF;
