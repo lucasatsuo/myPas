@@ -216,7 +216,7 @@ void stmt(void){
 			repstmt();
 			break;
 		default:
-			switch(lookahead){ // abstrai FIRST(smpexpr)
+			switch(lookahead){ /* abstrai FIRST(smpexpr) */
 				case '+': case '-': case '(':
 				case NOT: case ID: case UINT: case FLTP:
 				case TRUE: case FALSE:
@@ -289,14 +289,13 @@ smpexpr:                      |                          |
 
 ***************************************************************************/
 void smpexpr(void){
-	/* Estas flags sao usadas para aproximar a visualizacao do programa
-	com o digrama sintatico 
-	Permitem simples comparacao com o diagrama */
+	/* Estas flags sao usadas para aproximar a visualizacao do codigo
+	com o digrama sintatico */
 	flag_t    isneg  =  0;
 	flag_t    otimes =  0;
 	flag_t    oplus  =  0;
 
-/* Primeiro verifica se ha uma negacao */
+	/* Primeiro verifica se ha uma negacao */
 	oplus = lookahead;
 	if (oplus == '+' || oplus == '-' || oplus == NOT) {
 		match(oplus);

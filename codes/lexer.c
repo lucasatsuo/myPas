@@ -10,7 +10,7 @@ size_t collummnumber = 1;
 ignoreneutrals: 
 
             +-------+
--->----->-- |isspace| --.-----.--------------->-----------------.-->-- bye
+-->----->-- |isspace| --.-----.--------------->-----------------.-->-- end
   |     |   +-------+   |     V                                 ^
   |     ^               V     '->- ('{') -.---->---.- ('}') ->--|   
   |     '-------<-------'                 |        |            |         
@@ -28,7 +28,7 @@ token_t ignoreneutrals(FILE * tape){
     int head;
 _ignoreneutrals_start:
 
-/* collummnumber mantem a contagem das colunas, em sincronia com getc() ungetc() 
+/* collummnumber sincroniza a cada getc() e ungetc() 
    linenumber atualiza a contagem a cada \n encontrado */
     while (collummnumber++ && isspace(head = getc(tape))) { // ignora brancos
         if (head == '\n') {
@@ -80,6 +80,7 @@ token_t isASGN(FILE * tape)
 /**
 * Predicado que identifica e retorna tokens de operadores relacionais
 * ou 0 caso nao encontre.
+* isRELOP -> LEQ | NEQ | GEQ | > | < | =
 */
 token_t isRELOP(FILE * tape)
 {
@@ -118,11 +119,15 @@ token_t isRELOP(FILE * tape)
     return lexeme[0] = 0;
 }
 
-/** EE = [eE] ['+''-']? FRAC
-
-    FRAC = [0-9]+
-
-    **/
+/** checa se ha parte exponencial em um numero
+* entradas: arquivo fonte e indice do lexeme atual, garantindo que lexeme nao sera reescrito
+* saida: indice final apos identificacao da parte exponencial
+*
+* funcionamento definido pela regex:
+* EE: [eE] ['+'|'-']? FRAC
+* FRAC: [0-9]+
+* 
+**/
 int
 chk_EE(FILE * tape, int i0)
 {
@@ -130,7 +135,7 @@ chk_EE(FILE * tape, int i0)
     i++; /* deixa i sempre na ultima posicao vazia */
     if ( (lexeme[i] = toupper(getc(tape)) ) == 'E') {
         i++;
-        /** abstrai ['+''-'] **/
+        /** abstrai ['+'|'-'] **/
         if ((lexeme[i] = getc(tape)) == '+' || lexeme[i] == '-') {
             i++;
         } else {
@@ -273,6 +278,7 @@ token_t gettoken(FILE * tape)
     if(token = isNUM(tape))
         return token;
 
+    /* atualiza collummnumber quando token lido for apenas um caractere */
     token = getc(tape);
     collummnumber++;
     return token;

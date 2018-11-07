@@ -3,5 +3,5 @@
              var asf  ,  asdfa, aasdfsdafasdf  : integer;
 
 begin 
-    asf := _aoba;
+    asf := aoba;
 end .

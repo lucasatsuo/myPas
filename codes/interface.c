@@ -30,7 +30,7 @@ void match(token_t expected){
 }
 
 /**
-* Traduz o valor numerico do token, para string com seu significado
+* Traduz o valor numerico do token para string com seu significado
 */
 void translator(char *translated, token_t original){
 	if(original == -1){
@@ -41,6 +41,6 @@ void translator(char *translated, token_t original){
 	}else if(original < BEGIN){ /* e um dos tokens de tokens.h */
 		strcpy(translated, "TOKEN");
 	}else{
-		strcpy(translated, keyword[original-8192]); /* senao so pode ser uma keyword */
+		strcpy(translated, keyword[original-BEGIN]); /* senao so pode ser uma keyword */
 	}
 }
