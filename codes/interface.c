@@ -1,6 +1,4 @@
-#include <string.h>
 #include <interface.h>
-#include <lexer.h>
 
 extern size_t linenumber;
 extern size_t collummnumber;
@@ -8,46 +6,41 @@ extern char *keyword[];
 
 void translator(char *translated, token_t original);
 
-
-/*****************************************************
-*
-* o contador de colunas conta ate o caractere \n o que faz com que 
-* uma linha vazia tenha o tamanho 2, talvez nao cause problemas 
-* Uma solucao seria printar collummnumber-1 na linha 37
-*
-* como nao temos um dicionario com os tokens, como temos com keywords
-* o compilador aponta que foi esperado um token, mas sem dizer qual e
-* deveriamos adicionar esse vetorzao como ha em keywords.c ?
-*
-* acho que isso e tudo
-*
-*****************************************************/
-
+/**
+* Funcao que faz a ponte entre o parser e o lexer para identificar tokens no arquivo de entrada
+* para serem processados pela gramatica
+*/
 void match(token_t expected){
-	char charexp[MAXIDLEN], charlook[MAXIDLEN];
+	char stringexp[MAXIDLEN], stringlook[MAXIDLEN];
 
 	if(expected == lookahead){
 		lookahead = gettoken(source);
 	}else{
-		translator(charlook, lookahead);
-		translator(charexp, expected);
+		/* Ao encontrar um erro de sintaxe, recupera o texto do token translator()
+		Exibe o que e esperado e o que foi encontrado
+		e a localizacao do erro no codigo fonte */
+		translator(stringlook, lookahead);
+		translator(stringexp, expected);
 
-		printf("Token mismatch expected '%s', found '%s'\n", charexp, charlook);
+		printf("Token mismatch expected '%s', found '%s'\n", stringexp, stringlook);
 		printf("At line  : %d\n", linenumber);
-		printf("At column: %d\n",collummnumber);
+		printf("At column: %d\n", collummnumber);
 		exit(1);
 	}
 }
 
+/**
+* Traduz o valor numerico do token, para string com seu significado
+*/
 void translator(char *translated, token_t original){
 	if(original == -1){
 		strcpy(translated, "EOF");
-	}else if(original < 1024){
+	}else if(original < ID){ /* e um caractere ASCII */
 		translated[0] = original;
 		translated[1] = 0;
-	}else if(original < 8192){
+	}else if(original < BEGIN){ /* e um dos tokens de tokens.h */
 		strcpy(translated, "TOKEN");
 	}else{
-		strcpy(translated, keyword[original-8192]);
+		strcpy(translated, keyword[original-8192]); /* senao so pode ser uma keyword */
 	}
 }

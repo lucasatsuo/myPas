@@ -1,14 +1,12 @@
 /**@<lexer.c>::**/
 #include <lexer.h>
 
+/* variaveis que serao usadas para fazer contagem das linhas e colunas no arquivo 
+de entrada para apresenta-las ao encontrar um erro */
 size_t linenumber = 1;
 size_t collummnumber = 1;
 
-/* 3 formas de comentar qual deve ser usada e quando? 
-diagrama sintatico : por favor, nunca
-EBNF : somente nas gramaticas, perhaps
-regex 
-
+/*
 ignoreneutrals: 
 
             +-------+
@@ -21,27 +19,20 @@ ignoreneutrals:
   |                                                             |
   '-----------------------------<-------------------------------'
 
-
-
-ignoreneutrals: { {isspace} ['{' {^'}'} '}'] }
-
-ignoreneutrals: ( isspace* { [^}] } )*
-
-*/
-
-/**
+*
 * ignora caracteres que nao serao computados
-* entrada: traducao(source input stream)
+* entrada: arquivo de entrada
 * retorna: 0 ou -1 se encontrar EOF prematuro
 */
 token_t ignoreneutrals(FILE * tape){
     int head;
 _ignoreneutrals_start:
-    // pergunta: esses comentario sao bons? parece poluido
-    // collummnumber mantem a contagem das colunas, em sincronia com getc() ungetc()
+
+/* collummnumber mantem a contagem das colunas, em sincronia com getc() ungetc() 
+   linenumber atualiza a contagem a cada \n encontrado */
     while (collummnumber++ && isspace(head = getc(tape))) { // ignora brancos
         if (head == '\n') {
-            linenumber++; // linenumber e incrementado somente quando ha \n
+            linenumber++;
             collummnumber = 1;
         }
     }
@@ -62,8 +53,17 @@ _ignoreneutrals_start:
     return 0;
 }
 
+/**
+* Predicado para checar se ha a string de atribuicao
+* retornando o token ASGN se houver 
+* 0 se nao for identificada a atribuicao 
+*/
 token_t isASGN(FILE * tape)
 {
+    /* 
+    * lexeme e usado como backup dos caracteres lidos na string de entrada
+    * caso a string nao seja aceita, todos os caracteres lidos sao devolvidos.
+    */
     if ( (lexeme[0] = getc(tape)) == ':' ) {
         if ( (lexeme[1] = getc(tape)) == '=' ) {
             lexeme[2] = 0;
@@ -76,6 +76,11 @@ token_t isASGN(FILE * tape)
     return lexeme[0] = 0;
 }
 
+
+/**
+* Predicado que identifica e retorna tokens de operadores relacionais
+* ou 0 caso nao encontre.
+*/
 token_t isRELOP(FILE * tape)
 {
     switch (lexeme[0] = getc(tape)) {
@@ -121,19 +126,18 @@ token_t isRELOP(FILE * tape)
 int
 chk_EE(FILE * tape, int i0)
 {
-    /** using lexeme[i] as a subtape to easy possible backtracking **/
     int             i = i0;
-    i++; // deixa i sempre na ultima posicao + 1
+    i++; /* deixa i sempre na ultima posicao vazia */
     if ( (lexeme[i] = toupper(getc(tape)) ) == 'E') {
         i++;
-        /** abstracts ['+''-'] **/
+        /** abstrai ['+''-'] **/
         if ((lexeme[i] = getc(tape)) == '+' || lexeme[i] == '-') {
             i++;
         } else {
             ungetc(lexeme[i], tape);
         }
 
-        /** abstracts [0-9]+ **/
+        /** abstrai [0-9]+ **/
         if (isdigit(lexeme[i] = getc(tape))) {
             i++;
             while (isdigit(lexeme[i] = getc(tape)))
@@ -143,7 +147,7 @@ chk_EE(FILE * tape, int i0)
             i--;
             return i;
         } else {
-            /** reaching out this line means this is NAN **/
+            /** o que foi lido NAN **/
             for (; i > i0; i--) {
                 ungetc(lexeme[i], tape);
             }
@@ -151,16 +155,17 @@ chk_EE(FILE * tape, int i0)
         }
     }
 
-    /** at this point, not even an EE-prefix was found **/
+    /** nao foi encontrada parte exponencial, tudo que foi lido e devolvido **/
     while(i>i0)
         ungetc(lexeme[i--], tape);
     return i0;
 
 }
 
-// retorna token=uint ou token=fltp se for um numero
-// retorna 0 caso contrario
 /**
+* retorna token=uint ou token=fltp se for um numero
+* retorna 0 caso contrario
+*
 * isNUM -> UINT | FLTP 
 */
 token_t
@@ -202,7 +207,7 @@ isNUM(FILE * tape)
         ungetc(head, tape); i--;
     }
     if (token == 0) {
-        /** this is not a number **/
+        /** nao e um numero, devolve a entrada. **/
         for (i; i > 0; --i)
         {
             ungetc(lexeme[i], tape);
@@ -210,8 +215,9 @@ isNUM(FILE * tape)
         return 0;
     }
 
-    /** at this point we got a number, either UINT or FLTP **/
-    /** check scientific notation: **/
+    /** neste ponto ja temos um numero UINT ou FLTP 
+        verifica se ha parte exponencial. 
+        Atualiza o contador de colunas **/
     i = chk_EE(tape, i);
     lexeme[++i]=0;
     collummnumber += i;
@@ -219,6 +225,12 @@ isNUM(FILE * tape)
     return token;
 }
 
+/**
+* checa se a entrada tem o padrao de identificadores pascal
+* definido pela regex
+* 
+* [a-z|A-Z][a-z|A-Z|0-9|\_]*
+*/
 token_t isID(FILE * tape)
 {
     int i = 0;
@@ -230,18 +242,23 @@ token_t isID(FILE * tape)
             i++;
         ungetc(lexeme[i], tape);
         lexeme[i] = 0;
+        /* para em seguida verificar se e uma palavra reservada */
         token = iskeyword(lexeme);
+        
+        /* finalmente, atualiza o valor de collummnumber */
         if (token){
             collummnumber += i;
             return token;
         }
         collummnumber += i;
+        /* retorna token ID se nao for uma palavra reservada */
         return ID;
     }
 
     ungetc(lexeme[i], tape);
     return 0;
 }
+
 
 token_t gettoken(FILE * tape)
 {

@@ -2,14 +2,10 @@
 #include <parser.h>
 	
 /***************************************************************************
-*
-* a palavra "mod" em keywords nunca foi usada, deve ser implementada?
-* e quanto a FILE, TEXT, LOGIC, que tem na lista de 2014, ex 6 e 7
-*
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-Syntax definitions for the academic project My Pascal,
-which is a simplified / modified Pascal compiler,
-according to the following EBNF grammar:
+
+Definicoes sintaticas para uma versao simplificada de um compilador Pascal.
+Para o curso de Compiladores.
+De acordo com as seguintes gramaticas EBNF.
 
 Start symbol:: mypas
 
@@ -31,6 +27,7 @@ Declarative scope::
 
 header -> varmodel { procmodel | funcmodel }
 ***************************************************************************/
+/* Abstrai FIRST(subroutine) */
 flag_t issubroutine(void){
 	switch(lookahead){
 		case PROCEDURE:
@@ -233,6 +230,7 @@ void stmt(void){
 /***************************************************************************
 
 ifstmt -> IF expr THEN stmt [ ELSE stmt ]
+
 ***************************************************************************/
 void ifstmt(void){
 	match(IF);
@@ -274,33 +272,51 @@ void expr(void){
 }
 /***************************************************************************
 
-smpexpr -> [ + | - | NOT ] fact { otimes fact } { oplus fact { otimes fact }}
+smpexpr -> [ isneg ] fact { otimes fact } { oplus fact { otimes fact }}
 
+isneg  -> NOT | + | - 
 otimes -> AND | DIV | * | /
-
 oplus  -> OR | + | -
+
+                              .---<--- (  oplus ) ---<---.
+smpexpr:                      |                          |
+                              |   .-<- ( otimes ) -<-.   |
+                              |   |                  |   |
+                              |   |    +--------+    |   |
+-->-.-------->--------.--->---'->-'->- | factor | ->-'->-'---->---- end
+    |                 |                +--------+
+    '->- ( isneg ) ->-'
 
 ***************************************************************************/
 void smpexpr(void){
-	flag_t             isneg  =  0;
-	flag_t             otimes =  0;
-	flag_t             oplus  =  0;
+	/* Estas flags sao usadas para aproximar a visualizacao do programa
+	com o digrama sintatico 
+	Permitem simples comparacao com o diagrama */
+	flag_t    isneg  =  0;
+	flag_t    otimes =  0;
+	flag_t    oplus  =  0;
 
+/* Primeiro verifica se ha uma negacao */
 	oplus = lookahead;
 	if (oplus == '+' || oplus == '-' || oplus == NOT) {
 		match(oplus);
 	}
 
-	T_begin:
-
-	F_begin:
+	T_begin: F_begin:
 
 	factor();
 
+	/* Nesse ponto, esta dentro do laco em torno do factor
+	cada vez que encontra um otimes, ou oplus volta para o factor(), igual a gramatica
+	o uso do GOTO para otimizacao 
+	ifs com otimes e oplus abstraem respectivamente
+	{ otimes fact } 
+	{ oplus fact { otimes fact }}
+	*/
 	otimes = lookahead;
-	if (otimes == '*' || otimes == '/' || otimes == AND || otimes == DIV) {
+	if (otimes == '*' || otimes == '/' || otimes == AND || otimes == DIV || otimes == MOD) {
 		match(otimes);
-		goto F_begin;
+		goto F_begin; 
 	}
 
 	oplus = lookahead;
@@ -319,6 +335,7 @@ factor ->   ID [ ASGN expr | ( exprlist ) ]
 ***************************************************************************/
 void factor(void)
 {
+	/* Dentro de factor que sera feita a identificacao das variaveis e constantes */
 	switch (lookahead) {
 		case ID:
 		match(ID);
