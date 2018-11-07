@@ -4,7 +4,6 @@ extern size_t linenumber;
 extern size_t collummnumber;
 extern char *keyword[];
 
-void translator(char *translated, token_t original);
 
 /**
 * Funcao que faz a ponte entre o parser e o lexer para identificar tokens no arquivo de entrada

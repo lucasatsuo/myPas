@@ -10,3 +10,4 @@
 token_t lookahead;
 
 void match(token_t expected);
+void translator(char *translated, token_t original);

@@ -180,7 +180,7 @@ isNUM(FILE * tape)
     token_t token = 0;
 
     int head = getc(tape);
-    /** integer part **/
+    /** parte inteira **/
     if (isdigit(head)) {
         lexeme[i] = head;
         token = UINT;
@@ -191,6 +191,7 @@ isNUM(FILE * tape)
             ungetc(lexeme[i], tape);
         }
     }else{ ungetc(head, tape); }
+    /** parte nao inteira **/
     if ((head = getc(tape)) == '.') {
         lexeme[i] = head;
         if (token == UINT) {
@@ -230,14 +231,12 @@ isNUM(FILE * tape)
     return token;
 }
 
-/**
-* checa se a entrada tem o padrao de identificadores pascal
-* definido pela regex
-* 
-* [a-z|A-Z][a-z|A-Z|0-9|\_]*
-*/
 token_t isID(FILE * tape)
 {
+    /**
+    * checa se a entrada tem o padrao de identificadores pascal
+    * definido pela regex: [a-z|A-Z][a-z|A-Z|0-9|\_]*
+    */ 
     int i = 0;
     int token;
 
